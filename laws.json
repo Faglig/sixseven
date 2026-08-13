@@ -1,11 +1,38 @@
-
 [
   {
     "title": "Закон 1. Общие положения",
-    "content": "Текст закона 1. Здесь много текста."
+    "content": "Текст закона 1. Здесь много текста.",
+    "color": "#FF0000",
+    "font_size": 16,
+    "font_family": "Arial",
+    "bold": true,
+    "italic": false,
+    "underline": false,
+    "background": "#1F2937",
+    "alignment": "left"
   },
   {
     "title": "Закон 2. О нарушении",
-    "content": "Текст закона 2 с описанием нарушений."
+    "content": "Текст закона 2 с описанием нарушений.",
+    "color": "#00FF00",
+    "font_size": 14,
+    "font_family": "Times New Roman",
+    "bold": false,
+    "italic": true,
+    "underline": true,
+    "background": "transparent",
+    "alignment": "center"
+  },
+  {
+    "title": "Закон 3. Простой",
+    "content": "Обычный закон без форматирования.",
+    "color": "#F9FAFB",
+    "font_size": 12,
+    "font_family": "Arial",
+    "bold": false,
+    "italic": false,
+    "underline": false,
+    "background": "transparent",
+    "alignment": "left"
   }
 ]
