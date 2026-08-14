@@ -1,14 +1,18 @@
+# file: tabs/laws_tab.py
+
 from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve, QAbstractAnimation
 from PyQt5.QtGui import QTextCursor, QTextCharFormat, QColor
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLineEdit, QListWidget, QTextEdit, QSplitter,
     QGraphicsOpacityEffect, QLabel, QHBoxLayout
 )
+import re
+
 
 class LawsTab(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.data = []
+        self.data = []  # Список законов: [{title, content}]
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(6)
@@ -52,9 +56,14 @@ class LawsTab(QWidget):
         self.content_effect.setOpacity(0.0)
 
     def set_data(self, data):
-        if isinstance(data, dict):
-            data = data.get('laws', data.get('data', []))
-        self.data = data if isinstance(data, list) else []
+        """Принимает Markdown-текст или список законов"""
+        if isinstance(data, str):
+            self.data = self.parse_markdown(data)
+        elif isinstance(data, list):
+            self.data = data
+        else:
+            self.data = []
+        
         self.filter_list("")
         anim = QPropertyAnimation(self.content_effect, b"opacity", self)
         anim.setDuration(300)
@@ -62,6 +71,32 @@ class LawsTab(QWidget):
         anim.setEndValue(1.0)
         anim.setEasingCurve(QEasingCurve.OutCubic)
         anim.start(QAbstractAnimation.DeleteWhenStopped)
+
+    def parse_markdown(self, md_text):
+        """Парсит Markdown текст в список законов"""
+        laws = []
+        
+        # Разделяем по заголовкам ## или #
+        parts = re.split(r'^##?\s+', md_text, flags=re.MULTILINE)
+        
+        # Если текст начинается с заголовка
+        if parts and not parts[0].strip():
+            parts = parts[1:]
+        
+        for part in parts:
+            if not part.strip():
+                continue
+            
+            lines = part.strip().split('\n')
+            title = lines[0].strip()
+            content = '\n'.join(lines[1:]).strip() if len(lines) > 1 else ""
+            
+            laws.append({
+                "title": title,
+                "content": content
+            })
+        
+        return laws
 
     def filter_list(self, text):
         self.list_widget.clear()
@@ -129,48 +164,9 @@ class LawsTab(QWidget):
                     self.highlight_search(search_text)
 
     def display_law(self, law):
-        """Отображает закон с HTML-форматированием"""
-        title = law.get("title", "")
+        """Отображает закон с Markdown-форматированием"""
         content = law.get("content", "")
-        color = law.get("color", "#F9FAFB")
-        font_size = law.get("font_size", 12)
-        font_family = law.get("font_family", "Arial")
-        bold = law.get("bold", False)
-        italic = law.get("italic", False)
-        underline = law.get("underline", False)
-        background = law.get("background", "transparent")
-        alignment = law.get("alignment", "left")
-        
-        align_map = {
-            "left": "left",
-            "center": "center",
-            "right": "right",
-            "justify": "justify"
-        }
-        align = align_map.get(alignment, "left")
-        
-        font_weight = "bold" if bold else "normal"
-        font_style = "italic" if italic else "normal"
-        text_decoration = "underline" if underline else "none"
-        
-        html = f"""
-        <div style="
-            font-family: '{font_family}';
-            font-size: {font_size}px;
-            color: {color};
-            font-weight: {font_weight};
-            font-style: {font_style};
-            text-decoration: {text_decoration};
-            background-color: {background};
-            text-align: {align};
-            padding: 10px;
-            border-radius: 10px;
-        ">
-            {content}
-        </div>
-        """
-        
-        self.text_area.setHtml(html)
+        self.text_area.setMarkdown(content)
 
     def highlight_search(self, search_text):
         format = QTextCharFormat()
