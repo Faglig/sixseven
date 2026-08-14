@@ -299,12 +299,12 @@ class MainWindow(QMainWindow):
         QTimer.singleShot(250, QApplication.quit)
 
     def load_data(self):
-        self.laws_worker = DownloadWorker("https://raw.githubusercontent.com/Faglig/sixseven/main/laws.md")
+        self.laws_worker = DownloadWorker("https://raw.githubusercontent.com/Faglig/a-few-links-for-sixseven/main/laws.md")
         self.laws_worker.data_loaded.connect(self.laws_tab.set_data)
         self.laws_worker.error.connect(lambda msg: print(f"Ошибка загрузки законов: {msg}"))
         self.laws_worker.start()
         
-        self.features_worker = DownloadWorker("https://raw.githubusercontent.com/Faglig/sixseven/main/features.md")
+        self.features_worker = DownloadWorker("https://raw.githubusercontent.com/Faglig/a-few-links-for-sixseven/main/features.md")
         self.features_worker.data_loaded.connect(self.features_tab.set_data)
         self.features_worker.error.connect(lambda msg: print(f"Ошибка загрузки фич: {msg}"))
         self.features_worker.start()
